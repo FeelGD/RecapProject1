@@ -16,5 +16,80 @@ namespace RecapProject1
         {
             InitializeComponent();
         }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            ListProducts();
+            ListCategories();
+        }
+
+        private void ListProducts()
+        {
+            using (NorthwindContext context = new NorthwindContext())
+            {
+                dgwProducts.DataSource =
+                    context.Products
+                        .ToList(); //veri tabanına Select* from sorgusu yapacaktır. bu sorgu bize Product döndürecektir.
+            }
+        }
+        private void ListCategories()
+        {
+            using (NorthwindContext context = new NorthwindContext())
+            {
+                cbxCategory.DataSource = context.Categories.ToList();
+                cbxCategory.DisplayMember = "CategoryName";
+                cbxCategory.ValueMember = "CategoryId";
+
+            }
+        }
+        private void ListProductsByCategory(int categoryId)
+        {
+            using (NorthwindContext context = new NorthwindContext())
+            {
+                dgwProducts.DataSource =
+                    context.Products
+                        .Where(p => p.CategoryId == categoryId).ToList(); //veri tabanına Select* from sorgusu yapacaktır. bu sorgu bize Product döndürecektir.
+            }
+        }
+        private void ListProductsByProductName(string key)
+        {
+            using (NorthwindContext context = new NorthwindContext())
+            {
+                dgwProducts.DataSource =
+                    context.Products
+                        .Where(p => p.ProductName.ToLower().Contains(key.ToLower())).ToList();//ToLower büyük küçük duytarlılığını kaldırır. 
+            }
+        }
+
+        private void cbxCategory_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                ListProductsByCategory(Convert.ToInt32(cbxCategory.SelectedValue));
+            }
+            catch
+            {
+                
+            }
+            //MessageBox.Show(cbxCategory.SelectedValue.ToString());
+
+
+        }
+
+        private void tbxSearch_TextChanged(object sender, EventArgs e)
+        {
+            string key = tbxSearch.Text;
+            if (string.IsNullOrEmpty(key))//boş veya null olduğunda
+            {
+               ListProducts(); 
+            }
+            else
+            {
+               ListProductsByProductName(tbxSearch.Text); 
+            }
+            
+        }
+
+        
     }
 }
